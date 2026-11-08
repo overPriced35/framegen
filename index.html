@@ -3,214 +3,268 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>FrameGen — Minecraft Community</title>
-<meta name="description" content="FrameGen is a friendly Minecraft community. Join the server, grab perks in the store, and hang out on Discord.">
-<meta name="theme-color" content="#002e00">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2378b52a'/><text x='50' y='72' font-size='64' font-weight='900' text-anchor='middle' fill='%23fff8e6' font-family='Arial'>F</text></svg>">
+<title>FrameGen — Skyblock, Tycoon &amp; Generators</title>
+<meta name="description" content="FrameGen is a custom-built Minecraft server with Skyblock, Tycoon and Generators. Join at play.framegen.fun">
+<meta name="theme-color" content="#012d05">
+<link rel="icon" href="icon.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Lilita+One&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 <style>
-/* ====== EDIT THESE THREE LINKS (see CONFIG in the script too) ====== */
-:root{
-  --bg:#002e00; --bg2:#00400a; --grass:#9ad22e; --grass-d:#5f9a1a;
-  --cream:#fdf1d8; --gold:#ffc81e; --ink:#143a0a;
-  --r:22px; --ease:cubic-bezier(.2,.8,.2,1);
-}
+:root{--bg:#012d05;--band:#0b3a10;--grass:#9ad22e;--leaf:#5f9a1a;--cream:#fdf1d8;--gold:#ffc81e;--ink:#10300a;--ease:cubic-bezier(.2,.8,.2,1);--h:"Lilita One","Fredoka",ui-rounded,system-ui,sans-serif}
 *{box-sizing:border-box;margin:0}
 html{scroll-behavior:smooth}
-body{
-  font-family:ui-rounded,"Nunito","Segoe UI",system-ui,sans-serif;
-  color:var(--cream);background:var(--bg);min-height:100vh;
-  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
-  overflow-x:hidden;
-}
-/* Animated tilted "F" tile pattern */
-.bg{position:fixed;inset:-20%;z-index:-1;
-  background:
-   radial-gradient(circle at 50% 0%,var(--bg2),transparent 60%),
-   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cg transform='rotate(12 40 40)' fill='none' stroke='%23127a12' stroke-width='3' opacity='.55'%3E%3Crect x='28' y='28' width='24' height='24' rx='6'/%3E%3C/g%3E%3Ctext x='40' y='48' font-size='15' font-weight='900' text-anchor='middle' fill='%23127a12' opacity='.55' font-family='Arial' transform='rotate(12 40 40)'%3EF%3C/text%3E%3Cg transform='rotate(12 120 120)' fill='none' stroke='%23127a12' stroke-width='3' opacity='.55'%3E%3Crect x='108' y='108' width='24' height='24' rx='6'/%3E%3C/g%3E%3Ctext x='120' y='128' font-size='15' font-weight='900' text-anchor='middle' fill='%23127a12' opacity='.55' font-family='Arial' transform='rotate(12 120 120)'%3EF%3C/text%3E%3C/svg%3E");
-  animation:drift 60s linear infinite;
-}
+body{font-family:"Fredoka",ui-rounded,"Segoe UI",system-ui,sans-serif;font-weight:500;color:var(--cream);background:var(--bg);min-height:100vh;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom,0px)}
+h1,h2,h3,.btn,.chip,.role,a.tab,.brand{font-family:var(--h);font-weight:400;letter-spacing:.02em}
+.bg{position:fixed;inset:-160px;z-index:-1;animation:drift 40s linear infinite;background:radial-gradient(ellipse at 50% 0%,rgba(40,120,30,.45),transparent 65%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cdefs%3E%3Cg id='f' transform='rotate(12)' fill='none' stroke='%23158015' stroke-width='3' opacity='.5'%3E%3Crect x='-14' y='-14' width='28' height='28' rx='8'/%3E%3Ctext x='0' y='7' font-size='19' font-weight='900' text-anchor='middle' fill='%23158015' stroke='none' font-family='Arial'%3EF%3C/text%3E%3C/g%3E%3C/defs%3E%3Cuse href='%23f' x='80' y='80'/%3E%3Cuse href='%23f' x='0' y='0'/%3E%3Cuse href='%23f' x='160' y='0'/%3E%3Cuse href='%23f' x='0' y='160'/%3E%3Cuse href='%23f' x='160' y='160'/%3E%3C/svg%3E") center center/160px 160px repeat}
 @keyframes drift{to{transform:translate(160px,160px)}}
 
-/* Nav */
-header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:rgba(0,46,0,.72);border-bottom:3px solid rgba(154,210,46,.25)}
-nav{max-width:1080px;margin:auto;display:flex;align-items:center;gap:8px;padding:10px 18px}
-nav .brand{display:flex;align-items:center;margin-right:auto}
-nav .brand img{height:38px;width:auto}
-nav a.tab{color:var(--cream);text-decoration:none;font-weight:800;padding:9px 16px;border-radius:999px;transition:background .25s,transform .25s var(--ease),color .25s}
-nav a.tab:hover{background:rgba(253,241,216,.12);transform:translateY(-2px)}
-nav a.tab.on{background:var(--gold);color:var(--ink)}
-.discord-link{background:#5865f2;color:#fff!important}
-.discord-link:hover{background:#6c78ff!important}
-@media(max-width:640px){nav{flex-wrap:wrap;justify-content:center}nav .brand{margin:0 auto 4px;width:100%;justify-content:center}nav a.tab{padding:8px 12px;font-size:.92rem}}
+/* floating capsule nav */
+header{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:0;right:0;z-index:30;display:flex;justify-content:center;padding:0 12px;pointer-events:none}
+nav{pointer-events:auto;display:flex;align-items:center;gap:4px;background:rgba(1,45,5,.9);backdrop-filter:blur(10px);border:4px solid var(--cream);border-radius:999px;padding:6px 8px 6px 14px;box-shadow:0 6px 0 rgba(0,0,0,.35)}
+.brand{display:flex;align-items:center;gap:8px;color:var(--cream);text-decoration:none;font-size:1.35rem;margin-right:10px}
+.brand img{height:34px;width:auto;transition:transform .4s var(--ease)}.brand:hover img{transform:rotate(-10deg) scale(1.12)}
+.brand b{color:var(--gold);font-weight:400}
+a.tab{color:var(--cream);text-decoration:none;padding:8px 15px;border-radius:999px;font-size:1.05rem;transition:background .25s,color .25s,scale .25s var(--ease)}
+a.tab:hover{background:rgba(253,241,216,.14);scale:1.06}
+a.tab.on{background:var(--gold);color:var(--ink)}
+a.discord{background:#5865f2;color:#fff}a.discord:hover{background:#6c78ff}
+a.tab i,.btn i,.chip i{margin-right:7px}
+@media(max-width:640px){.brand span{display:none}.brand{margin-right:2px}nav{padding:5px 6px 5px 10px;gap:2px}a.tab{padding:7px 10px;font-size:.95rem}a.tab i{display:none}}
 
-main{max-width:1080px;margin:auto;padding:36px 18px 70px}
-.page{display:none}
+.page{display:none;padding-top:96px}
 .page.on{display:block;animation:in .55s var(--ease) both}
-@keyframes in{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.wrap{max-width:1080px;margin:auto;padding:0 18px}
 
-/* Hero */
-.hero{text-align:center;padding:20px 0 10px}
-.hero img.logo{width:min(560px,92%);height:auto;filter:drop-shadow(0 12px 0 rgba(0,0,0,.25));animation:bob 5s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-8px) rotate(-.6deg)}}
-.hero p{font-size:1.2rem;max-width:560px;margin:10px auto 26px;opacity:.92;line-height:1.5}
+/* hero */
+.hero{position:relative;padding-top:6px}
+.banner{position:relative;rotate:-1deg;border:5px solid var(--ink);border-radius:36px;overflow:hidden;box-shadow:0 10px 0 var(--ink),0 0 0 5px var(--cream);aspect-ratio:977/298;background:#4d9a58}
+.banner img{width:100%;height:100%;object-fit:cover;display:block;animation:sway 9s ease-in-out infinite}
+@keyframes sway{50%{transform:scale(1.04) translateY(-1.5%)}}
+.sp{position:absolute;width:clamp(26px,5vw,50px);animation:tw 3s ease-in-out infinite;pointer-events:none}
+@keyframes tw{50%{transform:scale(1.25) rotate(14deg)}}
+.cl{position:absolute;width:clamp(60px,12vw,120px);animation:bob 6s ease-in-out infinite;pointer-events:none}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.ip{display:block;position:relative;z-index:2;margin:-4vw auto 0;width:min(460px,92vw);aspect-ratio:406/120;border:0;background:url(ipbar.webp) 0 0/100% 100% no-repeat;container-type:inline-size;cursor:pointer;color:var(--cream);filter:drop-shadow(0 6px 0 rgba(0,0,0,.4));transition:scale .2s var(--ease),filter .2s}
+.ip:hover{scale:1.03;filter:brightness(1.08) drop-shadow(0 6px 0 rgba(0,0,0,.4))}
+.ip:active{scale:.98}
+.ip .t{position:absolute;left:26%;right:4%;top:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:2cqw;text-align:left}
+.ip small{display:block;font-family:"Fredoka";font-weight:600;font-size:3cqw;letter-spacing:.1em;text-transform:uppercase;opacity:.8;line-height:1.2}
+.ip b{display:block;font-family:var(--h);font-weight:400;font-size:7cqw;line-height:1.1;white-space:nowrap}
+.ip .copy{font-family:var(--h);background:var(--gold);color:var(--ink);border-radius:2.4cqw;padding:1.6cqw 3cqw;font-size:4.6cqw;white-space:nowrap;transition:background .2s}
+.ip .copy i{margin-right:1.2cqw}
+.ip.done .copy{background:var(--grass)}
+.tag{text-align:center;margin:30px auto 0;max-width:640px;font-size:1.25rem;line-height:1.5}
+.tag h1{font-size:clamp(2rem,6vw,3.2rem);color:var(--gold);text-shadow:0 4px 0 rgba(0,0,0,.35);line-height:1.1;margin-bottom:6px}
+.status{display:inline-flex;align-items:center;margin-top:16px;background:var(--cream);color:var(--ink);border:3px solid var(--ink);border-radius:999px;padding:3px 16px;font-weight:600;min-height:34px}
+.status:empty{display:none}
+.dot{width:10px;height:10px;border-radius:50%;background:#2fc01a;margin-right:8px;animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 #2fc01a}70%,100%{box-shadow:0 0 0 9px transparent}}
 
-.ip{display:inline-flex;align-items:center;gap:14px;background:var(--cream);color:var(--ink);border:4px solid var(--ink);border-radius:var(--r);padding:10px 12px 10px 22px;cursor:pointer;font:inherit;box-shadow:0 7px 0 var(--ink);transition:transform .15s var(--ease),box-shadow .15s}
-.ip:hover{transform:translateY(-3px);box-shadow:0 10px 0 var(--ink)}
-.ip:active{transform:translateY(5px);box-shadow:0 2px 0 var(--ink)}
-.ip small{display:block;font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.65;text-align:left}
-.ip b{font-size:1.45rem;font-weight:900;letter-spacing:.02em}
-.ip .copy{background:var(--grass);border:3px solid var(--ink);border-radius:14px;padding:10px 16px;font-weight:900;color:var(--ink);min-width:92px;transition:background .2s}
-.ip.done .copy{background:var(--gold)}
-.status{margin-top:18px;font-weight:800;opacity:.85;min-height:1.4em}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#7bff5a;margin-right:8px;box-shadow:0 0 0 0 #7bff5a;animation:pulse 2s infinite}
-@keyframes pulse{70%{box-shadow:0 0 0 10px transparent}}
+/* grass-drip band */
+.band{position:relative;background:var(--band);margin-top:64px;padding:78px 0 80px}
+.band::before{content:"";position:absolute;left:0;right:0;top:0;height:40px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40'%3E%3Cg fill='%2310300a'%3E%3Crect y='4' width='120' height='14'/%3E%3Ccircle cx='20' cy='18' r='9'/%3E%3Cellipse cx='55' cy='22' rx='7' ry='12'/%3E%3Ccircle cx='92' cy='18' r='10'/%3E%3C/g%3E%3Cg fill='%239ad22e'%3E%3Crect width='120' height='14'/%3E%3Ccircle cx='20' cy='14' r='9'/%3E%3Cellipse cx='55' cy='18' rx='7' ry='12'/%3E%3Ccircle cx='92' cy='14' r='10'/%3E%3C/g%3E%3C/svg%3E") repeat-x top/120px 40px}
+.title,.sec{font-family:var(--h);font-weight:400;color:var(--gold);text-shadow:0 4px 0 rgba(0,0,0,.35)}
+.title{font-size:clamp(2.2rem,7vw,3.4rem)}
+.sec{font-size:clamp(1.7rem,5vw,2.3rem);margin:56px 0 18px}
+.title::after,.sec::after{content:"";display:block;height:16px;width:190px;max-width:60%;background:url(swoosh.webp) left center/contain no-repeat;margin-top:2px}
+.band .sec{margin-top:0;text-align:center}.band .sec::after{margin:2px auto 0;background-position:center}
+.lead{font-size:1.15rem;line-height:1.6;max-width:720px;margin-top:10px}
 
-/* Cards */
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:44px}
-.card{background:rgba(253,241,216,.07);border:3px solid rgba(154,210,46,.35);border-radius:var(--r);padding:24px;transition:transform .3s var(--ease),border-color .3s,background .3s}
-.card:hover{transform:translateY(-6px) rotate(-.5deg);border-color:var(--grass);background:rgba(253,241,216,.11)}
-.card .ico{font-size:2rem;margin-bottom:10px}
-.card h3{margin-bottom:6px;color:var(--gold)}
-.card p{line-height:1.5;opacity:.9}
-h1.title{font-size:clamp(2rem,6vw,3rem);color:var(--gold);text-shadow:0 4px 0 rgba(0,0,0,.3);margin-bottom:8px}
-.lead{font-size:1.1rem;opacity:.9;line-height:1.6;max-width:700px;margin-bottom:10px}
+/* cream sticker panels */
+.panel{position:relative;background:var(--cream);color:var(--ink);border:5px solid var(--ink);border-radius:30px;box-shadow:0 8px 0 var(--ink);padding:26px}
+.panel h3{font-size:1.7rem;line-height:1.1;margin-bottom:6px}
+.panel p{line-height:1.5}
+.modes{display:grid;gap:30px;margin-top:40px}
+.mode{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;transition:scale .3s var(--ease)}
+.mode:nth-child(odd){rotate:-.7deg;margin-right:5%}.mode:nth-child(even){rotate:.7deg;margin-left:5%}
+.mode:hover{scale:1.015}
+.badge{width:92px;height:92px;display:grid;place-items:center;font-size:2.4rem;background:var(--gold);color:var(--ink);border:5px solid var(--ink);border-radius:26px;box-shadow:0 6px 0 var(--ink);rotate:-6deg;transition:rotate .3s var(--ease)}
+.mode:hover .badge{rotate:5deg}
+.num{position:absolute;top:-18px;right:22px;background:var(--grass);color:var(--ink);font-family:var(--h);border:4px solid var(--ink);border-radius:14px;padding:0 12px;font-size:1.3rem;box-shadow:0 4px 0 var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{background:#1d4a14;color:var(--gold);border:3px solid var(--ink);border-radius:999px;padding:3px 14px;font-size:1rem}
+.deco{position:absolute;pointer-events:none}
+@media(max-width:620px){.mode{grid-template-columns:1fr;gap:14px}.mode:nth-child(n){margin:0}.badge{width:74px;height:74px;font-size:1.9rem}.panel{padding:22px 20px}}
 
-.btn{display:inline-block;text-decoration:none;font-weight:900;background:var(--gold);color:var(--ink);border:3px solid var(--ink);border-radius:16px;padding:12px 22px;box-shadow:0 5px 0 var(--ink);transition:transform .15s,box-shadow .15s;margin-top:14px}
-.btn:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--ink)}
-.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
-.btn.green{background:var(--grass)}
-.btn.blurple{background:#5865f2;color:#fff}
+.cta{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:56px}
+.btn{display:inline-block;text-decoration:none;cursor:pointer;font-size:1.2rem;background:var(--gold);color:var(--ink);border:4px solid var(--ink);border-radius:18px;padding:11px 24px;box-shadow:0 6px 0 var(--ink);transition:translate .15s,box-shadow .15s}
+.btn:hover{translate:0 -3px;box-shadow:0 9px 0 var(--ink)}
+.btn:active{translate:0 5px;box-shadow:0 1px 0 var(--ink)}
+.btn.green{background:var(--grass)}.btn.blurple{background:#5865f2;color:#fff}
 
-/* Store */
-.store-frame{margin-top:24px;border:4px solid var(--grass);border-radius:var(--r);overflow:hidden;background:#fff;display:none}
-.store-frame iframe{width:100%;height:78vh;border:0}
-.store-frame.show{display:block}
+/* store / about */
+.soon{margin-top:28px;text-align:center;padding:34px 22px}
+.soon img{width:120px;height:auto;animation:bob 4s ease-in-out infinite}
+.soon h2{font-size:2rem;margin:6px 0}
+.shop{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;margin-top:22px}
+.price{font-family:var(--h);font-size:1.5rem;color:var(--leaf);margin:6px 0 4px}
+h2.cat{font-family:var(--h);font-weight:400;color:var(--grass);font-size:1.6rem;margin-top:34px}
+.lw{display:flex;flex-direction:column;align-items:center;gap:16px;padding:30px 0;font-family:var(--h)}
+.rules{list-style:none;counter-reset:r;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;padding:0}
+.rules li{counter-increment:r;position:relative;background:var(--cream);color:var(--ink);border:4px solid var(--ink);border-radius:20px;box-shadow:0 5px 0 var(--ink);padding:14px 16px 14px 66px;line-height:1.4}
+.rules li b{font-family:var(--h);font-weight:400;font-size:1.15rem}
+.rules li::before{content:counter(r);position:absolute;left:14px;top:50%;translate:0 -50%;width:38px;height:38px;border-radius:12px;rotate:-6deg;background:var(--gold);border:3px solid var(--ink);font-family:var(--h);display:grid;place-items:center;font-size:1.2rem}
+.staff{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:22px}
+.person{text-align:center;transition:scale .3s var(--ease),rotate .3s var(--ease)}
+.person:hover{scale:1.04;rotate:-1.2deg}
+.person img{width:88px;height:88px;image-rendering:pixelated;border-radius:18px;border:4px solid var(--ink);background:var(--cream);margin-bottom:10px;box-shadow:0 4px 0 var(--ink)}
+.person h3{font-size:1.35rem;word-break:break-all}
+.person p{font-size:.92rem}
+.role{display:inline-block;background:var(--gold);color:var(--ink);border:3px solid var(--ink);border-radius:999px;padding:1px 14px;font-size:.95rem;margin-bottom:8px}
+.role i{margin-right:6px}.role.adm{background:var(--grass)}.role.mod{background:#8fd6ff}.role.help{background:#ffb4d6}
+.person.open{background:transparent;color:var(--cream);border-style:dashed;border-color:rgba(253,241,216,.6);box-shadow:none}
+.person.open img{opacity:.4;image-rendering:auto;background:transparent;box-shadow:none;border-style:dashed}
+.person.open .role{background:transparent;color:var(--cream);border-color:rgba(253,241,216,.6)}
 
-/* Reveal */
-.rv{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.loader{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);transition:opacity .5s,visibility .5s}
+.loader.hide{opacity:0;visibility:hidden}
+.loader>div{display:flex;flex-direction:column;align-items:center}
+.loader img{width:min(360px,70vw);height:auto;margin-bottom:26px}
+.lb{width:min(340px,78vw);height:44px;transform:skewX(-28deg);border:5px solid var(--cream);border-radius:12px;background:#1d4a14;overflow:hidden;box-shadow:6px 6px 0 rgba(0,0,0,.35);position:relative}
+.lb i{position:absolute;left:0;top:0;bottom:0;width:0;background:repeating-linear-gradient(90deg,var(--gold) 0 22px,#e3ac0e 22px 44px);animation:fill 1.1s var(--ease) forwards}
+.lb.inf i{width:40%;animation:slide 1s ease-in-out infinite alternate}
+@keyframes fill{to{width:100%}}@keyframes slide{from{transform:translateX(-5%)}to{transform:translateX(145%)}}
+
+.rv{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
 .rv.in{opacity:1;transform:none}
-
-footer{text-align:center;padding:26px;opacity:.6;font-size:.9rem}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--gold);color:var(--ink);font-weight:900;border:3px solid var(--ink);border-radius:14px;padding:10px 18px;opacity:0;pointer-events:none;transition:.35s var(--ease);z-index:50}
+footer{text-align:center;padding:30px 18px;opacity:.65;font-size:.9rem}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--gold);color:var(--ink);font-family:var(--h);border:4px solid var(--ink);border-radius:16px;padding:8px 20px;opacity:0;pointer-events:none;transition:.35s var(--ease);z-index:50}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.lb i{width:100%}.rv{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<div class="loader" id="loader"><div><img src="logo.webp" alt="FrameGen"><div class="lb"><i></i></div></div></div>
+<noscript><style>#loader{display:none}.rv{opacity:1;transform:none}</style></noscript>
 <div class="bg" aria-hidden="true"></div>
 
-<header>
-  <nav>
-    <a class="brand" href="#home" aria-label="FrameGen home"><img src="logo.webp" alt="FrameGen" width="106" height="38"></a>
-    <a class="tab" href="#home" data-page="home">Home</a>
-    <a class="tab" href="#store" data-page="store">Store</a>
-    <a class="tab" href="#about" data-page="about">About</a>
-    <a class="tab discord-link" id="discordNav" href="#" target="_blank" rel="noopener">Discord</a>
-  </nav>
-</header>
+<header><nav>
+  <a class="brand" href="#home"><img src="icon.webp" alt="" width="36" height="34"><span>Frame<b>Gen</b></span></a>
+  <a class="tab" href="#home" data-page="home"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="tab" href="#store" data-page="store"><i class="fa-solid fa-cart-shopping"></i>Store</a>
+  <a class="tab" href="#about" data-page="about"><i class="fa-solid fa-circle-info"></i>About</a>
+  <a class="tab discord" data-link="discord" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i>Discord</a>
+</nav></header>
 
 <main>
-  <!-- HOME -->
-  <section class="page" id="home">
-    <div class="hero">
-      <img class="logo" src="logo.webp" alt="FrameGen logo" width="560" height="202">
-      <p>A cozy, creative Minecraft community. Build big, play together, and make some friends along the way.</p>
-      <button class="ip" id="ipBtn" aria-label="Copy server IP">
-        <span><small>Server IP · tap to copy</small><b id="ipText">play.framegen.net</b></span>
-        <span class="copy" id="ipLabel">Copy</span>
-      </button>
-      <div class="status" id="status"></div>
-    </div>
-    <div class="grid">
-      <div class="card rv"><div class="ico">⛏️</div><h3>Survive &amp; Build</h3><p>Fresh worlds, friendly players, and room for every kind of builder.</p></div>
-      <div class="card rv"><div class="ico">🛒</div><h3>Support the Server</h3><p>Ranks, perks, and cosmetics through our store. Every purchase keeps the lights on.</p><a class="btn green" href="#store">Visit store</a></div>
-      <div class="card rv"><div class="ico">💬</div><h3>Join the Chat</h3><p>Events, giveaways, and updates all live on our Discord.</p><a class="btn blurple" id="discordCard" href="#" target="_blank" rel="noopener">Join Discord</a></div>
-    </div>
-  </section>
+<section class="page" id="home">
+  <div class="wrap hero">
+    <div class="banner"><img src="banner.webp" alt="FrameGen" width="977" height="298"></div>
+    <img class="sp" src="sparkle.webp" alt="" style="left:2%;top:10%"><img class="sp" src="sparkle.webp" alt="" style="right:3%;top:2%;animation-delay:1.2s">
+    <button class="ip" id="ipBtn" aria-label="Copy server IP"><span class="t"><span><small>Server IP</small><b id="ipText"></b></span><span class="copy" id="ipLabel"><i class="fa-regular fa-copy"></i>Copy</span></span></button>
+    <div class="tag"><h1>Build. Earn. Expand.</h1><p>A custom-built Skyblock, Tycoon and Generators server. Start on a tiny island and grow it into an empire.</p><div class="status" id="status"></div></div>
+  </div>
 
-  <!-- STORE -->
-  <section class="page" id="store">
-    <h1 class="title">Store</h1>
-    <p class="lead">Ranks, crates, and cosmetics. Checkout is handled securely by Tebex, and your items arrive on the server automatically.</p>
-    <a class="btn" id="tebexBtn" href="#" target="_blank" rel="noopener">Open full store ↗</a>
-    <button class="btn green" id="embedBtn" type="button" style="font:inherit;font-weight:900;cursor:pointer">Show store here</button>
-    <div class="store-frame" id="storeFrame"></div>
-  </section>
-
-  <!-- ABOUT -->
-  <section class="page" id="about">
-    <h1 class="title">About FrameGen</h1>
-    <p class="lead">FrameGen is a community-first Minecraft server built around good vibes and good builds. Replace this paragraph with your story: who started it, what makes it different, and what players can look forward to.</p>
-    <div class="grid">
-      <div class="card rv"><div class="ico">🌱</div><h3>Our Mission</h3><p>A welcoming place for players of every age and skill level.</p></div>
-      <div class="card rv"><div class="ico">🛡️</div><h3>Fair &amp; Friendly</h3><p>Active staff, clear rules, and a zero-toxicity approach.</p></div>
-      <div class="card rv"><div class="ico">🎉</div><h3>Community Events</h3><p>Build contests, seasonal events, and giveaways all year.</p></div>
+  <div class="band">
+    <div class="wrap">
+      <h2 class="sec">Three ways to play</h2>
+      <div class="modes">
+        <div class="panel mode rv"><span class="num">01</span><div class="badge"><i class="fa-solid fa-cloud"></i></div><div><h3>Skyblock</h3><p>Standard Skyblock. Start on your own island, expand it, and build it up with friends.</p><div class="chips"><span class="chip"><i class="fa-solid fa-cube"></i>Your own island</span><span class="chip"><i class="fa-solid fa-users"></i>Play with friends</span></div></div><img class="deco" src="cloud.webp" alt="" style="width:74px;left:-26px;bottom:-22px"></div>
+        <div class="panel mode rv"><span class="num">02</span><div class="badge"><i class="fa-solid fa-industry"></i></div><div><h3>Tycoon</h3><p>Head to the public farms, mine, and fish your way up the ranks.</p><div class="chips"><span class="chip"><i class="fa-solid fa-wheat-awn"></i>Public farms</span><span class="chip"><i class="fa-solid fa-gem"></i>Mining</span><span class="chip"><i class="fa-solid fa-fish"></i>Fishing</span></div></div><img class="deco" src="sparkle.webp" alt="" style="width:34px;right:18px;bottom:14px"></div>
+        <div class="panel mode rv"><span class="num">03</span><div class="badge"><i class="fa-solid fa-bolt"></i></div><div><h3>Generators</h3><p>Generators produce money for you. Place them, upgrade your setup, and keep your income growing.</p><div class="chips"><span class="chip"><i class="fa-solid fa-coins"></i>Money generators</span></div></div><img class="deco" src="cloud.webp" alt="" style="width:70px;right:-22px;bottom:-22px;scale:-1 1"></div>
+      </div>
+      <div class="cta rv"><a class="btn green" href="#store"><i class="fa-solid fa-cart-shopping"></i>Visit the store</a><a class="btn blurple" data-link="discord" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i>Join our Discord</a></div>
     </div>
-    <a class="btn blurple" id="discordAbout" href="#" target="_blank" rel="noopener">Come say hi on Discord</a>
-  </section>
+  </div>
+</section>
+
+<section class="page" id="store"><div class="wrap">
+  <h1 class="title">Store</h1>
+  <p class="lead">Ranks, crates and perks. Checkout is handled securely by Tebex and your items arrive in-game automatically.</p>
+  <div id="storeBody"></div>
+</div></section>
+
+<section class="page" id="about"><div class="wrap">
+  <h1 class="title">About FrameGen</h1>
+  <p class="lead">FrameGen is a custom-built Minecraft server that mixes classic Skyblock with a Tycoon world and money-making Generators. Start small, grow at your own pace, and build something you are proud of.</p>
+  <h2 class="sec">Server rules</h2>
+  <!-- Edit these to match your real rules -->
+  <ol class="rules">
+    <li class="rv"><b>Be respectful.</b> No harassment, hate speech, or toxic behavior.</li>
+    <li class="rv"><b>No cheating.</b> Hacked clients and unfair advantages are not allowed.</li>
+    <li class="rv"><b>No exploiting.</b> Found a bug? Report it to staff instead of abusing it.</li>
+    <li class="rv"><b>No spam or advertising.</b> Keep chat clean and on-topic.</li>
+    <li class="rv"><b>Keep it family-friendly.</b> No inappropriate language or builds.</li>
+    <li class="rv"><b>No griefing or scamming.</b> Respect other players’ islands and trades.</li>
+    <li class="rv"><b>Staff decisions are final.</b> Questions or appeals go through our Discord.</li>
+  </ol>
+  <h2 class="sec">Meet the staff</h2>
+  <div class="staff" id="staff"></div>
+  <div class="cta"><a class="btn blurple" data-link="discord" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i>Join our Discord</a></div>
+</div></section>
 </main>
 
 <footer>© <span id="yr"></span> FrameGen · Not affiliated with Mojang or Microsoft</footer>
 <div class="toast" id="toast">Server IP copied!</div>
 
 <script>
-/* ============ CONFIG: edit these ============ */
-const CONFIG = {
-  serverIp:   "play.framegen.net",
-  discordUrl: "https://discord.gg/yourinvite",
-  tebexUrl:   "https://framegen.tebex.io",   // your Tebex webstore URL
-  javaPort:   "",                            // optional, e.g. "25565"
-  showStatus: true                           // live player count from mcsrvstat.us
+/* ============ CONFIG ============ */
+const CONFIG={
+  serverIp:"play.framegen.fun",
+  discordUrl:"https://discord.gg/CXDygZCf74",
+  tebexUrl:"https://framegen.tebex.store",
+  tebexToken:"",     // Tebex Headless public token (optional). Leave "" to just link to the store.
+  storeLive:false,   // set true once the Tebex store is up
+  showStatus:true
 };
-/* ============================================ */
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const STAFF=[ // name, role label, style class, icon, blurb
+  ["MisterCroissant","Owner · Main Developer","","crown","Founder and owner of FrameGen."],
+  ["XxKingAllyxX","Admin","adm","shield-halved","Keeps the server running smoothly."],
+  ["Emergenci_","Admin · Developer","adm","code","Admin and developer of the server."],
+  ["D0moh","Moderator","mod","gavel","Keeps chat and gameplay fair."],
+  ["qvFoxy","Helper","help","life-ring","Here to help new players."],
+  [null,"Moderator"],[null,"Helper"]
+];
+/* ================================ */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 $("#ipText").textContent=CONFIG.serverIp;
-["#discordNav","#discordCard","#discordAbout"].forEach(s=>$(s).href=CONFIG.discordUrl);
-$("#tebexBtn").href=CONFIG.tebexUrl;
+$$("[data-link=discord]").forEach(a=>a.href=CONFIG.discordUrl);
 $("#yr").textContent=new Date().getFullYear();
+$("#staff").innerHTML=STAFF.map(([n,r,c,i,b])=>n
+ ?`<div class="panel person rv"><img src="https://mc-heads.net/avatar/${n}/96" alt="${n}" loading="lazy" onerror="this.src='icon.webp'"><div><span class="role ${c}"><i class="fa-solid fa-${i}"></i>${r}</span></div><h3>${n}</h3><p>${b}</p></div>`
+ :`<div class="panel person open rv"><img src="icon.webp" alt=""><div><span class="role"><i class="fa-solid fa-plus"></i>${r}</span></div><h3>Position open</h3><p>We’re looking for more staff. Ask on Discord.</p></div>`).join("");
 
-/* Hash router with animated page swap */
+const ld=$("#loader"),hideLd=()=>setTimeout(()=>ld.classList.add("hide"),1100);
+document.readyState==="complete"?hideLd():addEventListener("load",hideLd);setTimeout(()=>ld.classList.add("hide"),4000);
+
 const pages=["home","store","about"];
 function route(){
   const p=pages.includes(location.hash.slice(1))?location.hash.slice(1):"home";
   $$(".page").forEach(e=>e.classList.toggle("on",e.id===p));
-  $$("nav a.tab[data-page]").forEach(a=>a.classList.toggle("on",a.dataset.page===p));
-  window.scrollTo({top:0});
-  requestAnimationFrame(reveal);
+  $$("a.tab[data-page]").forEach(a=>a.classList.toggle("on",a.dataset.page===p));
+  scrollTo({top:0});requestAnimationFrame(reveal);
 }
 addEventListener("hashchange",route);route();
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12});
+function reveal(){$$(".page.on .rv:not(.in)").forEach((e,i)=>{e.style.transitionDelay=(i%4)*90+"ms";io.observe(e)})}
 
-/* Scroll reveal */
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.15});
-function reveal(){$$(".page.on .rv:not(.in)").forEach((e,i)=>{e.style.transitionDelay=i*90+"ms";io.observe(e)})}
-
-/* Copy IP */
 let t;
 $("#ipBtn").addEventListener("click",async()=>{
-  const ip=CONFIG.serverIp+(CONFIG.javaPort?":"+CONFIG.javaPort:"");
-  try{await navigator.clipboard.writeText(ip)}catch(e){
-    const x=document.createElement("textarea");x.value=ip;document.body.appendChild(x);x.select();document.execCommand("copy");x.remove();
-  }
-  $("#ipBtn").classList.add("done");$("#ipLabel").textContent="Copied!";$("#toast").classList.add("show");
-  clearTimeout(t);t=setTimeout(()=>{$("#ipBtn").classList.remove("done");$("#ipLabel").textContent="Copy";$("#toast").classList.remove("show")},1800);
+  try{await navigator.clipboard.writeText(CONFIG.serverIp)}catch(e){const x=document.createElement("textarea");x.value=CONFIG.serverIp;document.body.appendChild(x);x.select();document.execCommand("copy");x.remove()}
+  $("#ipBtn").classList.add("done");$("#ipLabel").innerHTML='<i class="fa-solid fa-check"></i>Copied!';$("#toast").classList.add("show");
+  clearTimeout(t);t=setTimeout(()=>{$("#ipBtn").classList.remove("done");$("#ipLabel").innerHTML='<i class="fa-regular fa-copy"></i>Copy';$("#toast").classList.remove("show")},1800);
 });
+if(CONFIG.showStatus)fetch("https://api.mcsrvstat.us/3/"+CONFIG.serverIp).then(r=>r.json()).then(d=>{
+  $("#status").innerHTML=d.online?'<span class="dot"></span>'+d.players.online+' players online':'<i class="fa-solid fa-moon" style="margin-right:8px"></i>Server offline'}).catch(()=>{});
 
-/* Optional live status */
-if(CONFIG.showStatus){
-  fetch("https://api.mcsrvstat.us/3/"+CONFIG.serverIp).then(r=>r.json()).then(d=>{
-    $("#status").innerHTML=d.online
-      ?'<span class="dot"></span>'+d.players.online+' players online'
-      :'Server currently offline';
-  }).catch(()=>{});
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sb=$("#storeBody"),LOADING='<div class="lw"><div class="lb inf"><i></i></div>Loading store…</div>';
+const open_='<a class="btn" href="'+CONFIG.tebexUrl+'" target="_blank" rel="noopener" style="margin-top:22px">Open store <i class="fa-solid fa-arrow-up-right-from-square" style="margin:0 0 0 7px"></i></a>';
+function soon(){sb.innerHTML='<div class="panel soon"><img src="block.webp" alt=""><h2>Store opening soon</h2><p>Ranks, crates and perks are on the way. Join our Discord to hear first.</p><a class="btn blurple" style="margin-top:18px" href="'+CONFIG.discordUrl+'" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i>Join Discord</a></div>'}
+async function store(){
+  if(!CONFIG.storeLive)return soon();
+  if(!CONFIG.tebexToken){sb.innerHTML=open_;return}
+  sb.innerHTML=LOADING;
+  try{
+    const r=await fetch("https://headless.tebex.io/api/accounts/"+CONFIG.tebexToken+"/categories?includePackages=1");
+    const cats=(await r.json()).data||[];
+    sb.innerHTML=cats.filter(c=>c.packages&&c.packages.length).map(c=>'<h2 class="cat">'+esc(c.name)+'</h2><div class="shop">'+c.packages.map(p=>
+      '<div class="panel"><h3>'+esc(p.name)+'</h3><div class="price">'+esc(p.total_price??p.base_price)+' '+esc(p.currency||"")+'</div><a class="btn green" href="'+CONFIG.tebexUrl+'" target="_blank" rel="noopener" style="margin-top:8px"><i class="fa-solid fa-cart-shopping"></i>Buy on Tebex</a></div>').join("")+'</div>').join("")||soon();
+  }catch(e){sb.innerHTML=open_}
 }
-
-/* Tebex embed (optional, loaded only on click) */
-$("#embedBtn").addEventListener("click",()=>{
-  const f=$("#storeFrame");
-  if(!f.firstChild){const i=document.createElement("iframe");i.src=CONFIG.tebexUrl;i.title="FrameGen Store";i.loading="lazy";f.appendChild(i)}
-  f.classList.toggle("show");
-});
+store();
 </script>
 </body>
 </html>
