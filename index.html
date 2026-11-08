@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FrameGen — Minecraft Community</title>
+<meta name="description" content="FrameGen is a friendly Minecraft community. Join the server, grab perks in the store, and hang out on Discord.">
+<meta name="theme-color" content="#002e00">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2378b52a'/><text x='50' y='72' font-size='64' font-weight='900' text-anchor='middle' fill='%23fff8e6' font-family='Arial'>F</text></svg>">
+<style>
+/* ====== EDIT THESE THREE LINKS (see CONFIG in the script too) ====== */
+:root{
+  --bg:#002e00; --bg2:#00400a; --grass:#9ad22e; --grass-d:#5f9a1a;
+  --cream:#fdf1d8; --gold:#ffc81e; --ink:#143a0a;
+  --r:22px; --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:ui-rounded,"Nunito","Segoe UI",system-ui,sans-serif;
+  color:var(--cream);background:var(--bg);min-height:100vh;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  overflow-x:hidden;
+}
+/* Animated tilted "F" tile pattern */
+.bg{position:fixed;inset:-20%;z-index:-1;
+  background:
+   radial-gradient(circle at 50% 0%,var(--bg2),transparent 60%),
+   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cg transform='rotate(12 40 40)' fill='none' stroke='%23127a12' stroke-width='3' opacity='.55'%3E%3Crect x='28' y='28' width='24' height='24' rx='6'/%3E%3C/g%3E%3Ctext x='40' y='48' font-size='15' font-weight='900' text-anchor='middle' fill='%23127a12' opacity='.55' font-family='Arial' transform='rotate(12 40 40)'%3EF%3C/text%3E%3Cg transform='rotate(12 120 120)' fill='none' stroke='%23127a12' stroke-width='3' opacity='.55'%3E%3Crect x='108' y='108' width='24' height='24' rx='6'/%3E%3C/g%3E%3Ctext x='120' y='128' font-size='15' font-weight='900' text-anchor='middle' fill='%23127a12' opacity='.55' font-family='Arial' transform='rotate(12 120 120)'%3EF%3C/text%3E%3C/svg%3E");
+  animation:drift 60s linear infinite;
+}
+@keyframes drift{to{transform:translate(160px,160px)}}
+
+/* Nav */
+header{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);background:rgba(0,46,0,.72);border-bottom:3px solid rgba(154,210,46,.25)}
+nav{max-width:1080px;margin:auto;display:flex;align-items:center;gap:8px;padding:10px 18px}
+nav .brand{display:flex;align-items:center;margin-right:auto}
+nav .brand img{height:38px;width:auto}
+nav a.tab{color:var(--cream);text-decoration:none;font-weight:800;padding:9px 16px;border-radius:999px;transition:background .25s,transform .25s var(--ease),color .25s}
+nav a.tab:hover{background:rgba(253,241,216,.12);transform:translateY(-2px)}
+nav a.tab.on{background:var(--gold);color:var(--ink)}
+.discord-link{background:#5865f2;color:#fff!important}
+.discord-link:hover{background:#6c78ff!important}
+@media(max-width:640px){nav{flex-wrap:wrap;justify-content:center}nav .brand{margin:0 auto 4px;width:100%;justify-content:center}nav a.tab{padding:8px 12px;font-size:.92rem}}
+
+main{max-width:1080px;margin:auto;padding:36px 18px 70px}
+.page{display:none}
+.page.on{display:block;animation:in .55s var(--ease) both}
+@keyframes in{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+
+/* Hero */
+.hero{text-align:center;padding:20px 0 10px}
+.hero img.logo{width:min(560px,92%);height:auto;filter:drop-shadow(0 12px 0 rgba(0,0,0,.25));animation:bob 5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-.6deg)}}
+.hero p{font-size:1.2rem;max-width:560px;margin:10px auto 26px;opacity:.92;line-height:1.5}
+
+.ip{display:inline-flex;align-items:center;gap:14px;background:var(--cream);color:var(--ink);border:4px solid var(--ink);border-radius:var(--r);padding:10px 12px 10px 22px;cursor:pointer;font:inherit;box-shadow:0 7px 0 var(--ink);transition:transform .15s var(--ease),box-shadow .15s}
+.ip:hover{transform:translateY(-3px);box-shadow:0 10px 0 var(--ink)}
+.ip:active{transform:translateY(5px);box-shadow:0 2px 0 var(--ink)}
+.ip small{display:block;font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.65;text-align:left}
+.ip b{font-size:1.45rem;font-weight:900;letter-spacing:.02em}
+.ip .copy{background:var(--grass);border:3px solid var(--ink);border-radius:14px;padding:10px 16px;font-weight:900;color:var(--ink);min-width:92px;transition:background .2s}
+.ip.done .copy{background:var(--gold)}
+.status{margin-top:18px;font-weight:800;opacity:.85;min-height:1.4em}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#7bff5a;margin-right:8px;box-shadow:0 0 0 0 #7bff5a;animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 10px transparent}}
+
+/* Cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:44px}
+.card{background:rgba(253,241,216,.07);border:3px solid rgba(154,210,46,.35);border-radius:var(--r);padding:24px;transition:transform .3s var(--ease),border-color .3s,background .3s}
+.card:hover{transform:translateY(-6px) rotate(-.5deg);border-color:var(--grass);background:rgba(253,241,216,.11)}
+.card .ico{font-size:2rem;margin-bottom:10px}
+.card h3{margin-bottom:6px;color:var(--gold)}
+.card p{line-height:1.5;opacity:.9}
+h1.title{font-size:clamp(2rem,6vw,3rem);color:var(--gold);text-shadow:0 4px 0 rgba(0,0,0,.3);margin-bottom:8px}
+.lead{font-size:1.1rem;opacity:.9;line-height:1.6;max-width:700px;margin-bottom:10px}
+
+.btn{display:inline-block;text-decoration:none;font-weight:900;background:var(--gold);color:var(--ink);border:3px solid var(--ink);border-radius:16px;padding:12px 22px;box-shadow:0 5px 0 var(--ink);transition:transform .15s,box-shadow .15s;margin-top:14px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--ink)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.btn.green{background:var(--grass)}
+.btn.blurple{background:#5865f2;color:#fff}
+
+/* Store */
+.store-frame{margin-top:24px;border:4px solid var(--grass);border-radius:var(--r);overflow:hidden;background:#fff;display:none}
+.store-frame iframe{width:100%;height:78vh;border:0}
+.store-frame.show{display:block}
+
+/* Reveal */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.rv.in{opacity:1;transform:none}
+
+footer{text-align:center;padding:26px;opacity:.6;font-size:.9rem}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--gold);color:var(--ink);font-weight:900;border:3px solid var(--ink);border-radius:14px;padding:10px 18px;opacity:0;pointer-events:none;transition:.35s var(--ease);z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<header>
+  <nav>
+    <a class="brand" href="#home" aria-label="FrameGen home"><img src="logo.webp" alt="FrameGen" width="106" height="38"></a>
+    <a class="tab" href="#home" data-page="home">Home</a>
+    <a class="tab" href="#store" data-page="store">Store</a>
+    <a class="tab" href="#about" data-page="about">About</a>
+    <a class="tab discord-link" id="discordNav" href="#" target="_blank" rel="noopener">Discord</a>
+  </nav>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section class="page" id="home">
+    <div class="hero">
+      <img class="logo" src="logo.webp" alt="FrameGen logo" width="560" height="202">
+      <p>A cozy, creative Minecraft community. Build big, play together, and make some friends along the way.</p>
+      <button class="ip" id="ipBtn" aria-label="Copy server IP">
+        <span><small>Server IP · tap to copy</small><b id="ipText">play.framegen.net</b></span>
+        <span class="copy" id="ipLabel">Copy</span>
+      </button>
+      <div class="status" id="status"></div>
+    </div>
+    <div class="grid">
+      <div class="card rv"><div class="ico">⛏️</div><h3>Survive &amp; Build</h3><p>Fresh worlds, friendly players, and room for every kind of builder.</p></div>
+      <div class="card rv"><div class="ico">🛒</div><h3>Support the Server</h3><p>Ranks, perks, and cosmetics through our store. Every purchase keeps the lights on.</p><a class="btn green" href="#store">Visit store</a></div>
+      <div class="card rv"><div class="ico">💬</div><h3>Join the Chat</h3><p>Events, giveaways, and updates all live on our Discord.</p><a class="btn blurple" id="discordCard" href="#" target="_blank" rel="noopener">Join Discord</a></div>
+    </div>
+  </section>
+
+  <!-- STORE -->
+  <section class="page" id="store">
+    <h1 class="title">Store</h1>
+    <p class="lead">Ranks, crates, and cosmetics. Checkout is handled securely by Tebex, and your items arrive on the server automatically.</p>
+    <a class="btn" id="tebexBtn" href="#" target="_blank" rel="noopener">Open full store ↗</a>
+    <button class="btn green" id="embedBtn" type="button" style="font:inherit;font-weight:900;cursor:pointer">Show store here</button>
+    <div class="store-frame" id="storeFrame"></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="page" id="about">
+    <h1 class="title">About FrameGen</h1>
+    <p class="lead">FrameGen is a community-first Minecraft server built around good vibes and good builds. Replace this paragraph with your story: who started it, what makes it different, and what players can look forward to.</p>
+    <div class="grid">
+      <div class="card rv"><div class="ico">🌱</div><h3>Our Mission</h3><p>A welcoming place for players of every age and skill level.</p></div>
+      <div class="card rv"><div class="ico">🛡️</div><h3>Fair &amp; Friendly</h3><p>Active staff, clear rules, and a zero-toxicity approach.</p></div>
+      <div class="card rv"><div class="ico">🎉</div><h3>Community Events</h3><p>Build contests, seasonal events, and giveaways all year.</p></div>
+    </div>
+    <a class="btn blurple" id="discordAbout" href="#" target="_blank" rel="noopener">Come say hi on Discord</a>
+  </section>
+</main>
+
+<footer>© <span id="yr"></span> FrameGen · Not affiliated with Mojang or Microsoft</footer>
+<div class="toast" id="toast">Server IP copied!</div>
+
+<script>
+/* ============ CONFIG: edit these ============ */
+const CONFIG = {
+  serverIp:   "play.framegen.net",
+  discordUrl: "https://discord.gg/yourinvite",
+  tebexUrl:   "https://framegen.tebex.io",   // your Tebex webstore URL
+  javaPort:   "",                            // optional, e.g. "25565"
+  showStatus: true                           // live player count from mcsrvstat.us
+};
+/* ============================================ */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+$("#ipText").textContent=CONFIG.serverIp;
+["#discordNav","#discordCard","#discordAbout"].forEach(s=>$(s).href=CONFIG.discordUrl);
+$("#tebexBtn").href=CONFIG.tebexUrl;
+$("#yr").textContent=new Date().getFullYear();
+
+/* Hash router with animated page swap */
+const pages=["home","store","about"];
+function route(){
+  const p=pages.includes(location.hash.slice(1))?location.hash.slice(1):"home";
+  $$(".page").forEach(e=>e.classList.toggle("on",e.id===p));
+  $$("nav a.tab[data-page]").forEach(a=>a.classList.toggle("on",a.dataset.page===p));
+  window.scrollTo({top:0});
+  requestAnimationFrame(reveal);
+}
+addEventListener("hashchange",route);route();
+
+/* Scroll reveal */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.15});
+function reveal(){$$(".page.on .rv:not(.in)").forEach((e,i)=>{e.style.transitionDelay=i*90+"ms";io.observe(e)})}
+
+/* Copy IP */
+let t;
+$("#ipBtn").addEventListener("click",async()=>{
+  const ip=CONFIG.serverIp+(CONFIG.javaPort?":"+CONFIG.javaPort:"");
+  try{await navigator.clipboard.writeText(ip)}catch(e){
+    const x=document.createElement("textarea");x.value=ip;document.body.appendChild(x);x.select();document.execCommand("copy");x.remove();
+  }
+  $("#ipBtn").classList.add("done");$("#ipLabel").textContent="Copied!";$("#toast").classList.add("show");
+  clearTimeout(t);t=setTimeout(()=>{$("#ipBtn").classList.remove("done");$("#ipLabel").textContent="Copy";$("#toast").classList.remove("show")},1800);
+});
+
+/* Optional live status */
+if(CONFIG.showStatus){
+  fetch("https://api.mcsrvstat.us/3/"+CONFIG.serverIp).then(r=>r.json()).then(d=>{
+    $("#status").innerHTML=d.online
+      ?'<span class="dot"></span>'+d.players.online+' players online'
+      :'Server currently offline';
+  }).catch(()=>{});
+}
+
+/* Tebex embed (optional, loaded only on click) */
+$("#embedBtn").addEventListener("click",()=>{
+  const f=$("#storeFrame");
+  if(!f.firstChild){const i=document.createElement("iframe");i.src=CONFIG.tebexUrl;i.title="FrameGen Store";i.loading="lazy";f.appendChild(i)}
+  f.classList.toggle("show");
+});
+</script>
+</body>
+</html>
