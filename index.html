@@ -126,6 +126,7 @@ h2.cat{font-family:var(--h);font-weight:400;color:var(--grass);font-size:1.6rem;
 .pimg img{width:100%;height:100%;object-fit:cover}
 .pkg p{flex:1;font-size:.95rem}
 .price s{opacity:.5;font-size:.8em}
+.pbtns{display:flex;flex-wrap:wrap;gap:10px;width:100%}.pbtns .btn{margin:0;padding:8px 14px;font-size:1.05rem;flex:1 1 auto;text-align:center}
 .btn:disabled{opacity:.7;cursor:progress}
 .cartfab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;width:3.6rem;height:3.6rem;border-radius:50%;display:none;place-items:center;font-size:1.4rem;background:var(--gold);color:var(--ink);border:4px solid var(--ink);box-shadow:0 5px 0 var(--ink);cursor:pointer;transition:scale .2s var(--ease)}
 body.on-store .cartfab{display:grid}.cartfab:hover{scale:1.08}
@@ -293,7 +294,7 @@ $("#staff").innerHTML=STAFF.map(([n,r,c,i,b])=>n
 const ld=$("#loader"),hideLd=()=>setTimeout(()=>ld.classList.add("hide"),1100);
 document.readyState==="complete"?hideLd():addEventListener("load",hideLd);setTimeout(()=>ld.classList.add("hide"),4000);
 
-let tt;function toast(m){const e=$("#toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),1800)}
+let tt;function toast(m,ms){const e=$("#toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),ms||1800)}
 function closeCart(){$("#drawer").classList.remove("open");$("#drawer").setAttribute("aria-hidden","true");document.documentElement.classList.remove("lock")}
 function openCart(){$("#drawer").classList.add("open");$("#drawer").setAttribute("aria-hidden","false");document.documentElement.classList.add("lock")}
 const pages=["home","store","about"];
@@ -327,23 +328,38 @@ const plain=h=>{const t=(new DOMParser().parseFromString(h||"","text/html").body
 const ls={get:k=>{try{return localStorage.getItem(k)||""}catch(e){return""}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
 const J=async r=>{r=await r;if(!r.ok)throw new Error(r.status);return r.json()};
 let cats=[],active=0,uname=ls.get("fg_user");
-const card=p=>{const sale=p.base_price>p.total_price;return '<div class="panel pkg"><div class="pimg">'+(p.image?'<img src="'+esc(p.image)+'" alt="" loading="lazy">':'<i class="fa-solid fa-gear"></i>')+'</div><h3>'+esc(p.name)+'</h3><p>'+esc(plain(p.description))+'</p><div class="price">'+(sale?'<s>'+money(p.base_price,p.currency)+'</s> ':'')+money(p.total_price??p.base_price,p.currency)+'</div><button class="btn green add" data-id="'+esc(p.id)+'"><i class="fa-solid fa-cart-plus"></i>Add to cart</button></div>'};
+const card=p=>{const sale=p.base_price>p.total_price;return '<div class="panel pkg"><div class="pimg">'+(p.image?'<img src="'+esc(p.image)+'" alt="" loading="lazy">':'<i class="fa-solid fa-gear"></i>')+'</div><h3>'+esc(p.name)+'</h3><p>'+esc(plain(p.description))+'</p><div class="price">'+(sale?'<s>'+money(p.base_price,p.currency)+'</s> ':'')+money(p.total_price??p.base_price,p.currency)+'</div><div class="pbtns"><button class="btn green add" data-id="'+esc(p.id)+'"><i class="fa-solid fa-cart-plus"></i>Add to cart</button><button class="btn now" data-id="'+esc(p.id)+'"><i class="fa-solid fa-bolt"></i>Buy now</button></div></div>'};
 function render(){
   sb.innerHTML='<div class="toolbar"><label class="user"><i class="fa-solid fa-user"></i><input id="mcUser" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" maxlength="17" placeholder="Your Minecraft username" value="'+esc(uname)+'"></label><div class="pills">'+cats.map((c,i)=>'<button class="pill'+(i===active?' on':'')+'" data-c="'+i+'">'+esc(c.name)+'</button>').join("")+'</div></div><p class="err" id="storeErr" role="alert"></p><div class="shop">'+cats[active].packages.map(card).join("")+'</div>';
   $("#mcUser").addEventListener("input",e=>{uname=e.target.value.trim();ls.set("fg_user",uname)});
 }
 /* ---- cart (Tebex basket) ---- */
 let basket=null,bIdent=ls.get("fg_basket"),busy=false,cartMsg="";
-const BAD='Couldn’t reach the store. Try again, or <a href="'+CONFIG.tebexUrl+'" target="_blank" rel="noopener">open the store on Tebex</a>.';
+const BASE="https://headless.tebex.io/api";
+const BAD=e=>'Couldn’t reach the store'+(e&&e.status?' (error '+e.status+')':'')+'. Try again, or <a href="'+CONFIG.tebexUrl+'" target="_blank" rel="noopener">open the store on Tebex</a>.';
 async function api(path,method,body){
   method=method||"GET";
-  const r=await fetch(API+path,{method,headers:method==="GET"?{Accept:"application/json"}:{"Content-Type":"application/json",Accept:"application/json"},body:body?JSON.stringify(body):undefined});
+  const r=await fetch(path.startsWith("http")?path:API+path,{method,headers:method==="GET"?{Accept:"application/json"}:{"Content-Type":"application/json",Accept:"application/json"},body:body?JSON.stringify(body):undefined});
   if(!r.ok){const e=new Error("HTTP "+r.status);e.status=r.status;throw e}
   return r.status===204?null:r.json().catch(()=>null);
 }
-const items=()=>(basket&&basket.packages)||[];
+/* package add/remove live on /api/baskets/{ident}/packages (no token); fall back to the token path if that fails */
+async function pkgApi(ident,suffix,method,body){
+  try{return await api(BASE+"/baskets/"+ident+"/packages"+suffix,method,body)}
+  catch(e){if(!e.status||e.status===404||e.status===405)return api("/baskets/"+ident+"/packages"+suffix,method,body);throw e}
+}
+const backUrl=()=>location.protocol==="file:"?CONFIG.tebexUrl:location.origin+location.pathname+"#store";
+const mkBasket=async u=>(await api("/baskets","POST",{username:u,complete_url:backUrl(),cancel_url:backUrl(),complete_auto_redirect:true})).data;
+const addTo=(ident,id,q)=>pkgApi(ident,"","POST",{package_id:String(id),quantity:q});
+const items=()=>((basket&&basket.packages)||[]).slice().sort((a,b)=>String(a.name).localeCompare(String(b.name))||a.id-b.id);
 const qtyOf=()=>items().reduce((n,p)=>n+((p.in_basket&&p.in_basket.quantity)||1),0);
-const typeOf=id=>(cats.flatMap(c=>c.packages).find(p=>String(p.id)===String(id))||{}).type||"single";
+function launch(ident,url){
+  if(window.Tebex&&Tebex.checkout&&!matchMedia("(max-width:700px)").matches){
+    Tebex.checkout.init({ident,theme:"dark",colors:[{name:"primary",color:"#ffbe0b"},{name:"secondary",color:"#a7d83a"}]});Tebex.checkout.launch();return true;
+  }
+  if(url){location.href=url;return true}
+  return false;
+}
 async function refresh(){
   if(bIdent){
     try{const r=await api("/baskets/"+bIdent);basket=r&&r.data;if(!basket||basket.complete)throw Object.assign(new Error("gone"),{status:404})}
@@ -357,51 +373,59 @@ function paint(){
   $("#dfoot").hidden=!list.length;
   if(!list.length){$("#dbody").innerHTML='<div class="empty"><i class="fa-solid fa-cart-shopping"></i><p>Your cart is empty.</p></div>';return}
   const code=basket.creator_code;
-  $("#dbody").innerHTML=(basket.username?'<p class="pr" style="margin:10px 0 0;opacity:.7">Delivering to <b>'+esc(basket.username)+'</b></p>':'')
-   +list.map(p=>'<div class="ci"><div><b>'+esc(p.name)+'</b><span class="pr">'+money(p.in_basket.price,cur)+'</span></div><div class="qty"><button data-q="-1" data-id="'+esc(p.id)+'" aria-label="Decrease quantity">−</button><span class="n">'+p.in_basket.quantity+'</span><button data-q="1" data-id="'+esc(p.id)+'" aria-label="Increase quantity">+</button><button class="rm" data-rm="'+esc(p.id)+'" aria-label="Remove"><i class="fa-solid fa-trash"></i></button></div></div>').join("")
+  $("#dbody").innerHTML=(basket.username?'<p style="margin:10px 0 0;opacity:.7">Delivering to <b>'+esc(basket.username)+'</b></p>':'')
+   +list.map(p=>{const ib=p.in_basket||{};return '<div class="ci"><div><b>'+esc(p.name)+'</b><span class="pr">'+money(ib.price,cur)+'</span></div><div class="qty"><button data-q="-1" data-id="'+esc(p.id)+'" aria-label="Decrease quantity">−</button><span class="n">'+(ib.quantity||1)+'</span><button data-q="1" data-id="'+esc(p.id)+'" aria-label="Increase quantity">+</button><button class="rm" data-rm="'+esc(p.id)+'" aria-label="Remove"><i class="fa-solid fa-trash"></i></button></div></div>'}).join("")
    +(code?'<div class="code on"><span><i class="fa-solid fa-tag"></i> '+esc(code)+'</span><button id="rmCode">Remove</button></div>'
          :'<div class="code"><input id="codeIn" type="text" placeholder="Creator code" autocapitalize="off" spellcheck="false" maxlength="40"><button id="applyCode">Apply</button></div>')
    +'<p class="cerr" role="alert">'+esc(cartMsg)+'</p>'
    +'<div class="tot"><div><span>Subtotal</span><span>'+money(basket.base_price,cur)+'</span></div>'+(basket.sales_tax>0?'<div><span>Tax</span><span>'+money(basket.sales_tax,cur)+'</span></div>':'')+'<div class="big"><span>Total</span><span>'+money(basket.total_price,cur)+'</span></div><small>Final price is confirmed at checkout.</small></div>';
   cartMsg="";
 }
-async function run(fn){if(busy)return;busy=true;$("#drawer").classList.add("busy");try{await fn()}catch(e){cartMsg="Something went wrong. Please try again.";await refresh()}finally{busy=false;$("#drawer").classList.remove("busy")}}
-async function addPkg(id,btn){
+async function run(fn){if(busy)return;busy=true;$("#drawer").classList.add("busy");try{await fn()}catch(e){console.error(e);cartMsg="Something went wrong"+(e.status?" (error "+e.status+")":"")+". Please try again.";await refresh()}finally{busy=false;$("#drawer").classList.remove("busy")}}
+function userOk(){
   const err=$("#storeErr"),inp=$("#mcUser"),u=inp.value.trim();err.textContent="";
-  if(!/^[A-Za-z0-9_.]{3,17}$/.test(u)){err.textContent="Enter your Minecraft username first so we can deliver your items.";inp.focus();return}
-  if(basket&&basket.username&&basket.username.toLowerCase()!==u.toLowerCase()){err.innerHTML='Your cart is for <b>'+esc(basket.username)+'</b>. Empty your cart to switch usernames.';return}
-  ls.set("fg_user",u);
+  if(!/^[A-Za-z0-9_.]{3,17}$/.test(u)){err.textContent="Enter your Minecraft username first so we can deliver your items.";inp.focus();inp.scrollIntoView({block:"center",behavior:"smooth"});return null}
+  ls.set("fg_user",u);return u;
+}
+function fail(e,what){console.error(e);$("#storeErr").innerHTML=BAD(e);toast("Couldn’t "+what+(e&&e.status?" ("+e.status+")":""),3500)}
+async function addPkg(id,btn){
+  const u=userOk();if(!u)return;
+  if(basket&&basket.username&&basket.username.toLowerCase()!==u.toLowerCase()){$("#storeErr").innerHTML='Your cart is for <b>'+esc(basket.username)+'</b>. Empty your cart to switch usernames.';return}
   const html=btn.innerHTML;btn.disabled=true;btn.textContent="Adding…";
   try{
-    if(!bIdent){
-      const back=location.protocol==="file:"?CONFIG.tebexUrl:location.origin+location.pathname+"#store";
-      bIdent=(await api("/baskets","POST",{username:u,complete_url:back,cancel_url:back,complete_auto_redirect:true})).data.ident;ls.set("fg_basket",bIdent);
-    }
-    await api("/baskets/"+bIdent+"/packages","POST",{package_id:String(id),quantity:1,type:typeOf(id)});
-    await refresh();toast("Added to cart");
-  }catch(e){err.innerHTML=BAD;await refresh()}
+    if(!bIdent){bIdent=(await mkBasket(u)).ident;ls.set("fg_basket",bIdent)}
+    await addTo(bIdent,id,1);await refresh();toast("Added to cart");
+  }catch(e){fail(e,"add to cart");await refresh()}
+  btn.disabled=false;btn.innerHTML=html;
+}
+async function buyNow(id,btn){
+  const u=userOk();if(!u)return;
+  const html=btn.innerHTML;btn.disabled=true;btn.textContent="Starting…";
+  try{
+    const b=await mkBasket(u),r=await addTo(b.ident,id,1);
+    let url=(r&&r.data&&r.data.links&&r.data.links.checkout)||(b.links&&b.links.checkout);
+    if(!url){const g=await api("/baskets/"+b.ident);url=g&&g.data&&g.data.links&&g.data.links.checkout}
+    if(!launch(b.ident,url))throw new Error("no checkout link");
+  }catch(e){fail(e,"start checkout")}
   btn.disabled=false;btn.innerHTML=html;
 }
 async function setQty(id,d){
   const it=items().find(p=>String(p.id)===String(id));if(!it)return;
-  const q=(it.in_basket.quantity||1)+d,t=it.type||typeOf(id);
-  if(d>0)await api("/baskets/"+bIdent+"/packages","POST",{package_id:String(id),quantity:1,type:t});
-  else{await api("/baskets/"+bIdent+"/packages/remove","POST",{package_id:String(id)});if(q>0)await api("/baskets/"+bIdent+"/packages","POST",{package_id:String(id),quantity:q,type:t})}
+  const q=((it.in_basket&&it.in_basket.quantity)||1)+d;
+  await pkgApi(bIdent,"/remove","POST",{package_id:String(id)});
+  if(q>0)await addTo(bIdent,id,q);
   await refresh();
 }
-async function rmPkg(id){await api("/baskets/"+bIdent+"/packages/remove","POST",{package_id:String(id)});await refresh()}
+async function rmPkg(id){await pkgApi(bIdent,"/remove","POST",{package_id:String(id)});await refresh()}
 async function applyCode(){
   const v=($("#codeIn")||{}).value;if(!v||!v.trim())return;
-  try{await api("/baskets/"+bIdent+"/creator-codes","POST",{creator_code:v.trim()})}catch(e){if(e.status===422||e.status===404||e.status===400)cartMsg="That creator code isn’t valid.";else throw e}
+  try{await api("/baskets/"+bIdent+"/creator-codes","POST",{creator_code:v.trim()})}catch(e){if([400,404,422].includes(e.status))cartMsg="That creator code isn’t valid.";else throw e}
   await refresh();
 }
 async function rmCode(){await api("/baskets/"+bIdent+"/creator-codes/remove","POST");await refresh()}
 async function checkout(){
   await refresh();if(!qtyOf())return;
-  const url=basket.links&&basket.links.checkout;
-  if(window.Tebex&&Tebex.checkout&&!matchMedia("(max-width:700px)").matches){
-    Tebex.checkout.init({ident:bIdent,theme:"dark",colors:[{name:"primary",color:"#ffbe0b"},{name:"secondary",color:"#a7d83a"}]});Tebex.checkout.launch();closeCart();
-  }else if(url)location.href=url;else{cartMsg="Couldn’t start checkout. Please try again.";paint()}
+  if(launch(bIdent,basket.links&&basket.links.checkout))closeCart();else{cartMsg="Couldn’t start checkout. Please try again.";paint()}
 }
 function emptyCart(){bIdent="";ls.set("fg_basket","");basket=null;paint();toast("Cart emptied")}
 $("#cartFab").addEventListener("click",openCart);
@@ -418,8 +442,8 @@ $("#drawer").addEventListener("click",e=>{
 $("#drawer").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="codeIn")run(applyCode)});
 addEventListener("keydown",e=>{if(e.key==="Escape")closeCart()});
 sb.addEventListener("click",e=>{
-  const p=e.target.closest(".pill"),b=e.target.closest(".add");
-  if(p){active=+p.dataset.c;render()}else if(b)addPkg(b.dataset.id,b);
+  const p=e.target.closest(".pill"),b=e.target.closest(".add"),n=e.target.closest(".now");
+  if(p){active=+p.dataset.c;render()}else if(b)addPkg(b.dataset.id,b);else if(n)buyNow(n.dataset.id,n);
 });
 async function store(){
   if(!CONFIG.storeLive)return soon();
