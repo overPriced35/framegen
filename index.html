@@ -122,9 +122,17 @@ h2.cat{font-family:var(--h);font-weight:400;color:var(--grass);font-size:1.6rem;
 .pill:hover{scale:1.05}.pill.on{background:var(--gold);color:var(--ink)}
 .err{min-height:1.4em;margin-top:12px;font-weight:600;color:#ffb4a8}.err a{color:var(--gold)}
 .pkg{display:flex;flex-direction:column;align-items:flex-start;text-align:left}
-.pimg{width:100%;aspect-ratio:16/9;border-radius:18px;border:4px solid var(--ink);background:#14503a;color:var(--gold);display:grid;place-items:center;font-size:2.6rem;overflow:hidden;margin-bottom:14px}
-.pimg img{width:100%;height:100%;object-fit:cover}
-.pkg p{flex:1;font-size:.95rem}
+.pimg{width:100%;border-radius:18px;border:4px solid var(--ink);background:#14503a;color:var(--gold);display:grid;place-items:center;font-size:2.6rem;overflow:hidden;margin-bottom:14px}
+.pimg.ph{aspect-ratio:16/9}
+.pimg img{display:block;width:100%;height:auto}
+.pkg .price{margin-top:auto;padding-top:6px}
+.pdesc{width:100%;max-height:6.6em;overflow:hidden;font-size:.95rem;line-height:1.45;margin-bottom:4px}
+.pdesc.clamped{-webkit-mask-image:linear-gradient(#000 65%,transparent);mask-image:linear-gradient(#000 65%,transparent)}
+.pdesc.open{max-height:none;-webkit-mask-image:none;mask-image:none}
+.pdesc ul,.pdesc ol{padding-left:1.2em;margin:.3em 0}.pdesc p{margin:0 0 .5em}
+.more{background:none;border:0;font-family:var(--h);font-size:1rem;color:var(--leaf);cursor:pointer;padding:2px 0 8px;text-decoration:underline}.more[hidden]{display:none}
+.badge.sm{width:4rem;height:4rem;font-size:1.6rem;margin-bottom:12px}
+
 .price s{opacity:.5;font-size:.8em}
 .pbtns{display:flex;flex-wrap:wrap;gap:10px;width:100%}.pbtns .btn{margin:0;padding:8px 14px;font-size:1.05rem;flex:1 1 auto;text-align:center}
 .btn:disabled{opacity:.7;cursor:progress}
@@ -205,7 +213,7 @@ footer{text-align:center;padding:30px 18px;opacity:.65;font-size:.9rem}
   <a class="tab" href="#home" data-page="home"><i class="fa-solid fa-house"></i>Home</a>
   <a class="tab" href="#store" data-page="store"><i class="fa-solid fa-cart-shopping"></i>Store</a>
   <a class="tab" href="#about" data-page="about"><i class="fa-solid fa-circle-info"></i>About</a>
-  <a class="tab discord" data-link="discord" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i>Discord</a>
+  <a class="tab discord" data-link="discord" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i><span class="lbl">Discord</span></a>
 </nav></header>
 
 <main>
@@ -317,21 +325,39 @@ $("#ipBtn").addEventListener("click",async()=>{
 if(CONFIG.showStatus)fetch("https://api.mcsrvstat.us/3/"+CONFIG.serverIp).then(r=>r.json()).then(d=>{
   $("#status").innerHTML=d.online?'<span class="dot"></span>'+d.players.online+' players online':'<i class="fa-solid fa-moon" style="margin-right:8px"></i>Server offline'}).catch(()=>{});
 
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 const sb=$("#storeBody"),API="https://headless.tebex.io/api/accounts/"+CONFIG.tebexToken;
 const LOADING='<div class="lw"><div class="lb inf"><i></i></div>Loading store…</div>';
 const openBtn=l=>'<a class="btn" href="'+CONFIG.tebexUrl+'" target="_blank" rel="noopener">'+l+' <i class="fa-solid fa-arrow-up-right-from-square" style="margin:0 0 0 7px"></i></a>';
 const live=()=>{sb.innerHTML='<div class="panel soon"><img src="block.webp" alt=""><h2>Our store is live</h2><p>Grab ranks, crates and perks on our Tebex store. Your items arrive in-game automatically.</p>'+openBtn("Open the store")+'</div>'};
 const soon=()=>{sb.innerHTML='<div class="panel soon"><img src="block.webp" alt=""><h2>Store opening soon</h2><p>Ranks, crates and perks are on the way. Join our Discord to hear first.</p><a class="btn blurple" style="margin-top:18px" href="'+CONFIG.discordUrl+'" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i>Join Discord</a></div>'};
 const money=(v,c)=>{try{return new Intl.NumberFormat(undefined,{style:"currency",currency:c||"USD"}).format(v)}catch(e){return v+" "+(c||"")}};
+const OKT=new Set(["P","UL","OL","LI","STRONG","B","EM","I","U"]);
+function clean(h){
+  const walk=n=>{let o="";n.childNodes.forEach(c=>{
+    if(c.nodeType===3){o+=esc(c.textContent);return}
+    if(c.nodeType!==1)return;
+    const t=c.tagName;if(t==="SCRIPT"||t==="STYLE")return;
+    if(t==="BR"){o+="<br>";return}
+    const inner=walk(c);
+    if(/^H[1-6]$/.test(t))o+="<strong>"+inner+"</strong><br>";
+    else if(t==="DIV")o+=inner+"<br>";
+    else if(OKT.has(t)){const k=t.toLowerCase();o+="<"+k+">"+inner+"</"+k+">"}
+    else o+=inner;
+  });return o};
+  return walk(new DOMParser().parseFromString(h||"","text/html").body);
+}
+function fitDesc(){$$(".pdesc:not(.open)").forEach(d=>{const o=d.scrollHeight>d.clientHeight+2;d.classList.toggle("clamped",o);d.nextElementSibling.hidden=!o})}
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(fitDesc,150)});
 const plain=h=>{const t=(new DOMParser().parseFromString(h||"","text/html").body.textContent||"").replace(/\s+/g," ").trim();return t.length>150?t.slice(0,147)+"…":t};
 const ls={get:k=>{try{return localStorage.getItem(k)||""}catch(e){return""}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
 const J=async r=>{r=await r;if(!r.ok)throw new Error(r.status);return r.json()};
 let cats=[],active=0,uname=ls.get("fg_user");
-const card=p=>{const sale=p.base_price>p.total_price;return '<div class="panel pkg"><div class="pimg">'+(p.image?'<img src="'+esc(p.image)+'" alt="" loading="lazy">':'<i class="fa-solid fa-gear"></i>')+'</div><h3>'+esc(p.name)+'</h3><p>'+esc(plain(p.description))+'</p><div class="price">'+(sale?'<s>'+money(p.base_price,p.currency)+'</s> ':'')+money(p.total_price??p.base_price,p.currency)+'</div><div class="pbtns"><button class="btn green add" data-id="'+esc(p.id)+'"><i class="fa-solid fa-cart-plus"></i>Add to cart</button><button class="btn now" data-id="'+esc(p.id)+'"><i class="fa-solid fa-bolt"></i>Buy now</button></div></div>'};
+const card=p=>{const sale=p.base_price>p.total_price;return '<div class="panel pkg"><div class="pimg'+(p.image?'':' ph')+'">'+(p.image?'<img src="'+esc(p.image)+'" alt="" loading="lazy">':'<i class="fa-solid fa-gear"></i>')+'</div><h3>'+esc(p.name)+'</h3><div class="pdesc">'+clean(p.description)+'</div><button class="more" hidden>Show more</button><div class="price">'+(sale?'<s>'+money(p.base_price,p.currency)+'</s> ':'')+money(p.total_price??p.base_price,p.currency)+'</div><div class="pbtns"><button class="btn green add" data-id="'+esc(p.id)+'"><i class="fa-solid fa-cart-plus"></i>Add to cart</button><button class="btn now" data-id="'+esc(p.id)+'"><i class="fa-solid fa-bolt"></i>Buy now</button></div></div>'};
 function render(){
   sb.innerHTML='<div class="toolbar"><label class="user"><i class="fa-solid fa-user"></i><input id="mcUser" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" maxlength="17" placeholder="Your Minecraft username" value="'+esc(uname)+'"></label><div class="pills">'+cats.map((c,i)=>'<button class="pill'+(i===active?' on':'')+'" data-c="'+i+'">'+esc(c.name)+'</button>').join("")+'</div></div><p class="err" id="storeErr" role="alert"></p><div class="shop">'+cats[active].packages.map(card).join("")+'</div>';
   $("#mcUser").addEventListener("input",e=>{uname=e.target.value.trim();ls.set("fg_user",uname)});
+  requestAnimationFrame(fitDesc);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitDesc);
 }
 /* ---- cart (Tebex basket) ---- */
 let basket=null,bIdent=ls.get("fg_basket"),busy=false,cartMsg="";
@@ -442,8 +468,9 @@ $("#drawer").addEventListener("click",e=>{
 $("#drawer").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="codeIn")run(applyCode)});
 addEventListener("keydown",e=>{if(e.key==="Escape")closeCart()});
 sb.addEventListener("click",e=>{
-  const p=e.target.closest(".pill"),b=e.target.closest(".add"),n=e.target.closest(".now");
-  if(p){active=+p.dataset.c;render()}else if(b)addPkg(b.dataset.id,b);else if(n)buyNow(n.dataset.id,n);
+  const p=e.target.closest(".pill"),b=e.target.closest(".add"),n=e.target.closest(".now"),m=e.target.closest(".more");
+  if(m){const d=m.previousElementSibling;d.classList.toggle("open");m.textContent=d.classList.contains("open")?"Show less":"Show more";if(!d.classList.contains("open"))fitDesc()}
+  else if(p){active=+p.dataset.c;render()}else if(b)addPkg(b.dataset.id,b);else if(n)buyNow(n.dataset.id,n);
 });
 async function store(){
   if(!CONFIG.storeLive)return soon();
